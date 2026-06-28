@@ -1,0 +1,40 @@
+name: Android debug artifact
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "android/**"
+      - "src/**"
+      - "package*.json"
+      - "capacitor.config.ts"
+      - "vite.config.js"
+
+jobs:
+  debug-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+      - uses: android-actions/setup-android@v3
+      - run: npm ci
+      - name: Validate Android API variable
+        run: test -n "${{ vars.NINOPULSE_API_BASE_URL }}"
+      - run: echo "VITE_API_BASE_URL=${{ vars.NINOPULSE_API_BASE_URL }}" > .env.android
+      - run: npm run android:config
+      - run: npm run build
+      - run: npm run android:sync
+      - run: chmod +x android/gradlew
+      - run: npm run android:apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ninopulse-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk

@@ -1,0 +1,71 @@
+export const ensoFallback = {
+  ok: true,
+  stale: true,
+  generatedAt: "2026-06-11T12:00:00.000Z",
+  refreshIntervalMs: 600000,
+  warning: "A API oficial ainda não respondeu. Exibindo o último boletim NOAA incorporado ao projeto.",
+  current: {
+    phase: "El Niño",
+    alertStatus: "El Niño Advisory",
+    alertStatusPt: "Aviso de El Niño",
+    synopsis: "El Niño conditions are present and expected to strengthen into the Northern Hemisphere winter 2026-27.",
+    issuedAt: "2026-06-11T12:00:00.000Z",
+    issuedLabel: "11 June 2026",
+    nextUpdate: "2026-07-09T12:00:00.000Z",
+    nextUpdateLabel: "9 July 2026",
+    weeklySst: {
+      date: "2026-06-11T12:00:00.000Z",
+      dateLabel: "11JUN2026",
+      regions: {
+        nino12: { sst: null, anomaly: 2.1 },
+        nino3: { sst: null, anomaly: null },
+        nino34: { sst: null, anomaly: 0.7 },
+        nino4: { sst: null, anomaly: 0.7 },
+      },
+    },
+  },
+  forecast: {
+    issuedAt: "2026-06-01T12:00:00.000Z",
+    issuedLabel: "June 2026",
+    selectedSeason: {
+      season: "MJJ",
+      probability: { laNina: 0, neutral: 3, elNino: 97 },
+      strength: {
+        laNina: { veryStrong: 0, strong: 0, moderate: 0, weak: 0 },
+        neutral: 3,
+        elNino: { weak: 86, moderate: 11, strong: 0, veryStrong: 0 },
+      },
+    },
+    seasons: [
+      { season: "MJJ", probability: { laNina: 0, neutral: 3, elNino: 97 } },
+      { season: "JJA", probability: { laNina: 0, neutral: 1, elNino: 99 } },
+      { season: "JAS", probability: { laNina: 0, neutral: 1, elNino: 99 } },
+      { season: "ASO", probability: { laNina: 0, neutral: 0, elNino: 100 } },
+      { season: "SON", probability: { laNina: 0, neutral: 0, elNino: 100 } },
+      { season: "OND", probability: { laNina: 0, neutral: 0, elNino: 100 } },
+      { season: "NDJ", probability: { laNina: 0, neutral: 0, elNino: 100 } },
+      { season: "DJF", probability: { laNina: 0, neutral: 1, elNino: 99 } },
+      { season: "JFM", probability: { laNina: 0, neutral: 2, elNino: 98 } },
+    ],
+  },
+  sources: [
+    {
+      name: "NOAA/CPC — ENSO Diagnostic Discussion",
+      url: "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/ensodisc.shtml",
+      cadence: "monthly",
+      available: false,
+    },
+    {
+      name: "NOAA/CPC — Official ENSO Strength Probabilities",
+      url: "https://www.cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/strengths/",
+      cadence: "monthly",
+      available: false,
+    },
+    {
+      name: "NOAA/CPC — Weekly Niño SST Indices",
+      url: "https://www.cpc.ncep.noaa.gov/data/indices/wksst9120.for",
+      cadence: "weekly",
+      available: false,
+    },
+  ],
+};
