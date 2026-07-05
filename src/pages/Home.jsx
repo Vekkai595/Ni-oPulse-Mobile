@@ -1,6 +1,19 @@
 import React, { Suspense, lazy, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Activity, ArrowUpRight, BarChart3, CalendarClock, ChevronRight, Database, Globe2, MapPin, RefreshCw, Search, ShieldCheck, ThermometerSun } from "lucide-react";
+import {
+  Activity,
+  ArrowUpRight,
+  BarChart3,
+  CalendarClock,
+  ChevronRight,
+  Database,
+  Globe2,
+  MapPin,
+  RefreshCw,
+  Search,
+  ShieldCheck,
+  ThermometerSun,
+} from "lucide-react";
 import NavBar from "@/components/elnino/NavBar";
 import FilterBar from "@/components/elnino/FilterBar";
 import CountryPanel from "@/components/elnino/CountryPanel";
@@ -16,7 +29,10 @@ const WorldMap = lazy(() => import("@/components/elnino/WorldMap"));
 function SectionLoader({ label = "NiñoPulse…", minHeight = 280 }) {
   return (
     <div className="mobile-section px-3" style={{ minHeight }}>
-      <div className="surface-card grid h-full min-h-[inherit] place-items-center text-sm text-muted-foreground" role="status">
+      <div
+        className="surface-card grid h-full min-h-[inherit] place-items-center text-sm text-muted-foreground"
+        role="status"
+      >
         <span className="loading-pulse">{label}</span>
       </div>
     </div>
@@ -32,10 +48,14 @@ export default function Home() {
   const [riskFilter, setRiskFilter] = useState("all");
   const [threatFilter, setThreatFilter] = useState(null);
   const [query, setQuery] = useState("");
+
   const { language, t } = useLanguage();
   const { data, isFallback, isFetching, refetch } = useEnsoData();
 
-  const localizedCountries = useMemo(() => localizeCountries(countries, language), [language]);
+  const localizedCountries = useMemo(
+    () => localizeCountries(countries, language),
+    [language]
+  );
 
   const visibleCountries = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -96,10 +116,29 @@ export default function Home() {
             </p>
 
             <div className="mt-5 grid grid-cols-2 gap-3">
-              <MetricCard icon={Activity} label={t("hero.phase")} value={data.current?.phase || "—"} />
-              <MetricCard icon={BarChart3} label={t("hero.probability")} value={pct(selectedSeason?.probability?.elNino)} />
-              <MetricCard icon={ThermometerSun} label={t("hero.nino34")} value={formatAnomaly(nino34)} />
-              <MetricCard icon={CalendarClock} label={t("hero.next")} value={data.current?.nextUpdateLabel || "—"} />
+              <MetricCard
+                icon={Activity}
+                label={t("hero.phase")}
+                value={data.current?.phase || "—"}
+              />
+
+              <MetricCard
+                icon={BarChart3}
+                label={t("hero.probability")}
+                value={pct(selectedSeason?.probability?.elNino)}
+              />
+
+              <MetricCard
+                icon={ThermometerSun}
+                label={t("hero.nino34")}
+                value={formatAnomaly(nino34)}
+              />
+
+              <MetricCard
+                icon={CalendarClock}
+                label={t("hero.next")}
+                value={data.current?.nextUpdateLabel || "—"}
+              />
             </div>
 
             <div className="mt-5 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
@@ -108,7 +147,8 @@ export default function Home() {
               </a>
 
               <a href="#paises" className="mobile-pill">
-                <Globe2 className="h-4 w-4" /> {language === "pt" ? "Países" : "Countries"}
+                <Globe2 className="h-4 w-4" />{" "}
+                {language === "pt" ? "Países" : "Countries"}
               </a>
 
               <a href="#previsao" className="mobile-pill">
@@ -127,8 +167,16 @@ export default function Home() {
           aria-label={language === "pt" ? "Resumo rápido" : "Quick summary"}
         >
           <div className="mx-auto grid max-w-md grid-cols-3 gap-2">
-            <MiniStat value={localizedCountries.length} label={language === "pt" ? "países" : "countries"} />
-            <MiniStat value={highRiskCount} label={language === "pt" ? "alto risco" : "high risk"} />
+            <MiniStat
+              value={localizedCountries.length}
+              label={language === "pt" ? "países" : "countries"}
+            />
+
+            <MiniStat
+              value={highRiskCount}
+              label={language === "pt" ? "alto risco" : "high risk"}
+            />
+
             <MiniStat
               value={seasonLabel(selectedSeason?.season, language).split(" · ")[0] || "—"}
               label={language === "pt" ? "janela" : "season"}
@@ -141,7 +189,9 @@ export default function Home() {
             <div className="mb-3 flex items-end justify-between gap-3">
               <div>
                 <p className="section-kicker mb-1">{t("map.layers")}</p>
-                <h2 className="font-display text-2xl font-black tracking-tight">{t("map.title")}</h2>
+                <h2 className="font-display text-2xl font-black tracking-tight">
+                  {t("map.title")}
+                </h2>
               </div>
 
               <span className="shrink-0 rounded-full bg-secondary px-2.5 py-1 text-xs font-bold text-muted-foreground">
@@ -157,7 +207,14 @@ export default function Home() {
             />
 
             <div className="mobile-map-card mt-3">
-              <Suspense fallback={<SectionLoader minHeight={430} label={language === "pt" ? "Carregando mapa…" : "Loading map…"} />}>
+              <Suspense
+                fallback={
+                  <SectionLoader
+                    minHeight={430}
+                    label={language === "pt" ? "Carregando mapa…" : "Loading map…"}
+                  />
+                }
+              >
                 <WorldMap
                   riskFilter={riskFilter}
                   threatFilter={threatFilter}
@@ -179,8 +236,12 @@ export default function Home() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="section-kicker mb-1">NOAA/CPC</p>
-                <h2 className="font-display text-2xl font-black tracking-tight">{t("forecast.title")}</h2>
-                <p className="mt-2 text-xs leading-5 text-muted-foreground">{t("forecast.explanation")}</p>
+                <h2 className="font-display text-2xl font-black tracking-tight">
+                  {t("forecast.title")}
+                </h2>
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                  {t("forecast.explanation")}
+                </p>
               </div>
 
               <button
@@ -195,7 +256,10 @@ export default function Home() {
 
             <div className="mt-4 space-y-2">
               {seasons.map((item) => (
-                <div key={item.season} className="rounded-2xl border border-border bg-background/55 p-3">
+                <div
+                  key={item.season}
+                  className="rounded-2xl border border-border bg-background/55 p-3"
+                >
                   <div className="mb-2 flex items-center justify-between gap-3">
                     <span className="text-sm font-black">
                       {seasonLabel(item.season, language)}
@@ -208,7 +272,10 @@ export default function Home() {
 
                   <div className="grid grid-cols-3 gap-2 text-center text-[11px] font-bold">
                     <Probability label="La Niña" value={item.probability.laNina} />
-                    <Probability label={t("forecast.neutral")} value={item.probability.neutral} />
+                    <Probability
+                      label={t("forecast.neutral")}
+                      value={item.probability.neutral}
+                    />
                     <Probability label="El Niño" value={item.probability.elNino} primary />
                   </div>
                 </div>
@@ -222,7 +289,9 @@ export default function Home() {
             <div className="mb-3 flex items-end justify-between gap-3">
               <div>
                 <p className="section-kicker mb-1">{t("countries.kicker")}</p>
-                <h2 className="font-display text-2xl font-black tracking-tight">{t("countries.title")}</h2>
+                <h2 className="font-display text-2xl font-black tracking-tight">
+                  {t("countries.title")}
+                </h2>
               </div>
 
               <span className="shrink-0 text-xs font-bold text-muted-foreground">
@@ -232,6 +301,7 @@ export default function Home() {
 
             <label className="relative block">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
@@ -298,7 +368,9 @@ export default function Home() {
 
               <div>
                 <h2 className="font-display text-xl font-black">
-                  {language === "pt" ? "Painel pronto para avaliação" : "Dashboard ready for review"}
+                  {language === "pt"
+                    ? "Painel pronto para avaliação"
+                    : "Dashboard ready for review"}
                 </h2>
 
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
@@ -307,7 +379,10 @@ export default function Home() {
                     : `Last update: ${formatDateTime(data.generatedAt, language)}. The dashboard prioritizes official data, quick reading, touch navigation and interactive climate-risk visualization.`}
                 </p>
 
-                <Link to="/about" className="mt-4 inline-flex items-center gap-1.5 text-sm font-black text-primary">
+                <Link
+                  to="/about"
+                  className="mt-4 inline-flex items-center gap-1.5 text-sm font-black text-primary"
+                >
                   {t("nav.about")} <ArrowUpRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -332,8 +407,12 @@ function MetricCard({ icon: Icon, label, value }) {
   return (
     <div className="rounded-2xl border border-border bg-background/70 p-3">
       <Icon className="h-4 w-4 text-primary" />
-      <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p className="mt-1 break-words font-display text-lg font-black leading-tight">{value}</p>
+      <p className="mt-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-1 break-words font-display text-lg font-black leading-tight">
+        {value}
+      </p>
     </div>
   );
 }
@@ -342,14 +421,20 @@ function MiniStat({ value, label }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-3 text-center shadow-sm">
       <p className="font-display text-lg font-black">{value}</p>
-      <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{label}</p>
+      <p className="mt-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </p>
     </div>
   );
 }
 
 function Probability({ label, value, primary = false }) {
   return (
-    <div className={`rounded-xl p-2 ${primary ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"}`}>
+    <div
+      className={`rounded-xl p-2 ${
+        primary ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
+      }`}
+    >
       <p>{label}</p>
       <p className="mt-1 text-sm font-black">{value}%</p>
     </div>
