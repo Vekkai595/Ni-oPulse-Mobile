@@ -24,9 +24,7 @@ jobs:
           distribution: temurin
           java-version: 21
           cache: gradle
-      - uses: android-actions/setup-android@v3
       - run: npm ci
-      - run: sdkmanager "platforms;android-36" "build-tools;35.0.0"
       - run: npm run android:prepare
         env:
           VITE_API_BASE_URL: ${{ vars.NINOPULSE_API_BASE_URL }}
