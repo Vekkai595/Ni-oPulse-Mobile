@@ -1,51 +1,14 @@
-# Política de Privacidade — NiñoPulse Global
+# Política de privacidade · NiñoPulse Global
 
-Última atualização: 28 de junho de 2026
+Atualizada em 7 de novembro de 2026.
 
-O NiñoPulse Global é uma plataforma educacional de monitoramento climático focada em ENSO, El Niño, La Niña, dados meteorológicos, mapas e indicadores climáticos.
+O NiñoPulse Global é uma plataforma de tempo e clima. O app funciona sem cadastro, anúncios ou rastreamento publicitário. O contato do projeto é **vekkai595@gmail.com**.
 
-Esta política explica como o app/site lida com informações dos usuários.
+- A busca envia o nome pesquisado à geocodificação do Open-Meteo. Consultas meteorológicas enviam as coordenadas do ponto selecionado ao Open-Meteo.
+- A localização do dispositivo é opcional. A tela explica o uso antes de pedir a permissão do sistema. As coordenadas são arredondadas a duas casas decimais antes de consultar o Open-Meteo. A posição e a previsão dessa sessão ficam em memória.
+- Os avisos usam o ponto público de uma cidade. O backend opcional recebe esse ponto e consulta NWS ou Defesa Civil. O NWS recebe as coordenadas de pontos nos Estados Unidos. No Brasil, o app cruza o ponto com o feed público do IDAP. A NOAA/CPC fornece os indicadores climáticos.
+- Os provedores de dados e hospedagem podem receber o IP e outros dados técnicos de conexão. O NiñoPulse usa esses dados para prestar o serviço.
 
-## 1. Coleta de dados pessoais
+Idioma, tema, cidades salvas, previsões, amostras para comparação e preferências de acompanhamento ficam no dispositivo. Meu Clima guarda até oito amostras diárias por local, para até 24 locais. A entrega de notificações exige permissão e depende de verificações com o app aberto. As preferências ficam em **Alertas**.
 
-O NiñoPulse Global não exige cadastro, login, senha ou criação de conta. O app não solicita nome, endereço, telefone, documentos, dados bancários ou outras informações pessoais sensíveis.
-
-## 2. Dados usados para funcionamento
-
-O app pode usar dados técnicos básicos necessários para funcionar, como conexão com a internet, carregamento de mapas, gráficos e dados climáticos. Preferências como idioma, tema e favoritos podem ficar salvas localmente no próprio dispositivo/navegador do usuário.
-
-## 3. Fontes externas e APIs
-
-O NiñoPulse Global exibe informações climáticas e meteorológicas obtidas de fontes externas, incluindo dados públicos da NOAA/CPC, Open-Meteo e serviços de consulta de países, estados e cidades.
-
-Ao pesquisar ou selecionar uma cidade, o nome da cidade/estado/país pode ser enviado a APIs externas para localizar coordenadas e retornar a previsão do tempo. O NiñoPulse não usa esses dados para identificar o usuário.
-
-## 4. Compartilhamento e venda de dados
-
-O NiñoPulse Global não vende dados dos usuários e não compartilha dados pessoais para publicidade, rastreamento comercial ou criação de perfis.
-
-Serviços externos usados para mapas, clima, hospedagem e APIs podem processar dados técnicos de acordo com suas próprias políticas.
-
-## 5. Localização, anúncios e login
-
-O app não pede localização GPS precisa, não possui login obrigatório e não exibe anúncios nesta versão. A consulta de clima local acontece pela cidade escolhida manualmente pelo usuário.
-
-## 6. Crianças e adolescentes
-
-O projeto tem finalidade educacional e pode ser usado por estudantes, professores e pessoas interessadas em ciência. O app não coleta intencionalmente dados pessoais de crianças ou adolescentes.
-
-## 7. Segurança e alterações
-
-O app busca usar apenas dados necessários para funcionamento e pode atualizar esta política no futuro para refletir mudanças no produto, novas funcionalidades ou exigências legais.
-
-## 8. Contato
-
-Em caso de dúvidas sobre esta Política de Privacidade, entre em contato pelo e-mail: vekkai595@gmail.com
-
-## URL pública para Google Play
-
-Depois do deploy na Vercel, use:
-
-```text
-https://SEU-SITE.vercel.app/privacy
-```
+Para apagar os dados, limpe os dados do app no Android ou do site no navegador. Para revogar as permissões, use as configurações do sistema ou navegador. A política também está disponível no app e na rota pública `/privacy`.

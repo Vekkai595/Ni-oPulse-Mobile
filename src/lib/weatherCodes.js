@@ -1,4 +1,5 @@
 export function weatherCodeKey(code) {
+  if (code == null || code === "") return "unknown";
   const value = Number(code);
   if (value === 0) return "clear";
   if (value === 1) return "mostlyClear";
@@ -18,7 +19,7 @@ export function weatherCodeKey(code) {
 }
 
 export function roundWeatherValue(value, fallback = "—") {
-  return Number.isFinite(Number(value)) ? Math.round(Number(value)) : fallback;
+  return value != null && value !== "" && Number.isFinite(Number(value)) ? Math.round(Number(value)) : fallback;
 }
 
 export function formatCountryLocalTime(value) {

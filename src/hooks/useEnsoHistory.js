@@ -1,43 +1,23 @@
-import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { historyFallback } from "@/lib/historyFallback";
-import { resolveApiUrl } from "@/lib/runtime";
+import { loadNoaaHistory } from "@/lib/noaaHistory";
+import { readLocal, writeLocal } from "@/lib/localStore";
+import { climateSource, nativeSource } from "@/services/officialData";
 
-const STORAGE_KEY = "ninopulse-last-valid-history";
-
-function readCached() {
-  try {
-    const value = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return value?.datasets ? value : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-async function fetchHistory({ signal }) {
-  const response = await fetch(resolveApiUrl("/api/history"), { signal, headers: { Accept: "application/json" } });
-  if (!response.ok) throw new Error(`History API returned HTTP ${response.status}`);
-  return response.json();
-}
+const KEY = "ninopulse-official-history-v3";
+const EMPTY = { datasets: {}, sources: [], stale: true };
 
 export function useEnsoHistory() {
-  const cached = typeof window === "undefined" ? undefined : readCached();
   const query = useQuery({
-    queryKey: ["enso-history"],
-    queryFn: fetchHistory,
-    initialData: cached,
-    staleTime: 12 * 60 * 60 * 1000,
-    refetchOnWindowFocus: false,
-    retry: 1,
+    queryKey: ["enso-history-v3"],
+    initialData: () => readLocal(KEY) ?? undefined,
+    initialDataUpdatedAt: () => Date.parse(readLocal(KEY)?.generatedAt) || undefined,
+    queryFn: async ({ signal }) => {
+      const data = await climateSource("/api/history", () => loadNoaaHistory(({ url }) => nativeSource(url)), signal);
+      if (!data?.ok || !Object.keys(data.datasets ?? {}).length) throw new Error("Invalid NOAA history response");
+      if (!data.stale) writeLocal(KEY, data);
+      return data;
+    },
+    staleTime: 12 * 60 * 60 * 1000, retry: 1,
   });
-
-  useEffect(() => {
-    if (query.data?.datasets && !query.data?.stale) localStorage.setItem(STORAGE_KEY, JSON.stringify(query.data));
-  }, [query.data]);
-
-  return {
-    ...query,
-    data: query.data || cached || historyFallback,
-    isFallback: !query.data || Boolean(query.data?.stale),
-  };
+  return { ...query, data: query.data || EMPTY, isFallback: !query.data || query.isError || query.isPaused || Boolean(query.data?.stale) };
 }

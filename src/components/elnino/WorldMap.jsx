@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { CircleMarker, MapContainer, TileLayer, Tooltip, useMap } from "react-leaflet";
-import { Layers3, Loader2, Maximize2, Minimize2, WifiOff } from "lucide-react";
-import { useTheme } from "next-themes";
+import { CircleMarker, MapContainer, Tooltip, useMap } from "react-leaflet";
+import { Layers3, Maximize2, Minimize2 } from "lucide-react";
+import Basemap from "@/components/pulse/Basemap";
 import { countries, riskColors } from "@/lib/elNinoData";
 import { localizeCountries } from "@/lib/localizedContent";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -172,10 +172,6 @@ export default function WorldMap({ riskFilter, threatFilter, onCountryClick }) {
   const [layer, setLayer] = useState("risk");
   const [fullscreen, setFullscreen] = useState(false);
   const [interactionEnabled, setInteractionEnabled] = useState(false);
-  const [useFallbackTiles, setUseFallbackTiles] = useState(false);
-  const [tileLoading, setTileLoading] = useState(true);
-  const [online, setOnline] = useState(() => typeof navigator === "undefined" || navigator.onLine);
-  const { resolvedTheme } = useTheme();
   const isMobile = useIsMobile();
   const { language, t } = useLanguage();
   const localized = useMemo(() => localizeCountries(countries, language), [language]);
@@ -188,22 +184,6 @@ export default function WorldMap({ riskFilter, threatFilter, onCountryClick }) {
   const points = useMemo(() => filtered.map((country) => [country.lat, country.lng]), [filtered]);
   const useStaticMobileMap = isMobile && !fullscreen;
   const mapInteractive = !isMobile || fullscreen || interactionEnabled;
-
-  useEffect(() => {
-    setUseFallbackTiles(false);
-    setTileLoading(true);
-  }, [resolvedTheme]);
-
-  useEffect(() => {
-    const onOnline = () => setOnline(true);
-    const onOffline = () => setOnline(false);
-    window.addEventListener("online", onOnline);
-    window.addEventListener("offline", onOffline);
-    return () => {
-      window.removeEventListener("online", onOnline);
-      window.removeEventListener("offline", onOffline);
-    };
-  }, []);
 
   useEffect(() => {
     if (!fullscreen) return undefined;
@@ -230,14 +210,6 @@ export default function WorldMap({ riskFilter, threatFilter, onCountryClick }) {
     if (!fullscreen && isMobile) setInteractionEnabled(false);
   }, [fullscreen, isMobile]);
 
-  const cartoUrl = resolvedTheme === "light"
-    ? "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png"
-    : "https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png";
-  const tileUrl = useFallbackTiles ? "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" : cartoUrl;
-  const tileAttribution = useFallbackTiles
-    ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    : '&copy; <a href="https://carto.com/">CARTO</a>';
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 14 }}
@@ -250,7 +222,6 @@ export default function WorldMap({ riskFilter, threatFilter, onCountryClick }) {
           <span className="relative flex h-2.5 w-2.5 shrink-0"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-50" /><span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-primary" /></span>
           <h2 className="truncate font-display text-sm font-bold sm:text-base">{t("map.title")}</h2>
           <span className="shrink-0 text-xs text-muted-foreground">{filtered.length}</span>
-          {!online && <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-accent/10 px-2 py-1 text-[10px] font-semibold text-accent"><WifiOff className="h-3 w-3" /> Offline</span>}
         </div>
         <div className="map-control-strip flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
           <Layers3 className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -283,29 +254,14 @@ export default function WorldMap({ riskFilter, threatFilter, onCountryClick }) {
           touchZoom={mapInteractive}
           doubleClickZoom={mapInteractive}
           worldCopyJump
-          preferCanvas
           zoomControl={!isMobile}
           className="h-full w-full"
-          style={{ background: "hsl(var(--background))" }}
+          style={{ background: "#152e2e" }}
         >
           <MapResizeController fullscreen={fullscreen} />
           <MapFitController points={points} fullscreen={fullscreen} />
           <MapInteractionController enabled={mapInteractive} />
-          <TileLayer
-            key={tileUrl}
-            url={tileUrl}
-            attribution={tileAttribution}
-            updateWhenIdle
-            keepBuffer={2}
-            eventHandlers={{
-              loading: () => setTileLoading(true),
-              load: () => setTileLoading(false),
-              tileerror: () => {
-                setTileLoading(false);
-                setUseFallbackTiles(true);
-              },
-            }}
-          />
+          <Basemap />
           {filtered.map((country) => {
             const color = riskColors[country.nivelDeRisco];
             const isHovered = hovered === country.id;
@@ -332,18 +288,6 @@ export default function WorldMap({ riskFilter, threatFilter, onCountryClick }) {
             );
           })}
         </MapContainer>
-        )}
-
-        {!useStaticMobileMap && tileLoading && online && (
-          <div className="pointer-events-none absolute inset-0 z-[450] grid place-items-center bg-background/25 backdrop-blur-[1px]">
-            <span className="inline-flex items-center gap-2 rounded-full border border-border bg-background/90 px-3 py-2 text-xs text-muted-foreground shadow-lg"><Loader2 className="h-4 w-4 animate-spin text-primary" />{language === "pt" ? "Carregando mapa" : "Loading map"}</span>
-          </div>
-        )}
-
-        {!online && (
-          <div className="pointer-events-none absolute inset-x-3 bottom-3 z-[500] rounded-xl border border-border bg-background/90 p-3 text-xs text-muted-foreground shadow-lg backdrop-blur-lg">
-            {language === "pt" ? "Sem conexão. O mapa usa os blocos já armazenados no dispositivo quando disponíveis." : "No connection. The map uses tiles already cached on this device when available."}
-          </div>
         )}
 
         {!filtered.length && (

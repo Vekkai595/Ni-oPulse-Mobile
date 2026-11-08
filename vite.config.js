@@ -1,3 +1,4 @@
+import { alertsResponse } from "./server/alerts-service.js";
 import path from "node:path";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
@@ -22,6 +23,12 @@ function noaaApiPlugin() {
     configureServer(server) {
       server.middlewares.use(async (request, response, next) => {
         const url = new URL(request.url || "/", "http://localhost");
+
+        if (url.pathname === "/api/alerts") {
+          const { status, body } = await alertsResponse(request.method, url.searchParams);
+          sendJson(response, status, body);
+          return;
+        }
 
         if (url.pathname === "/api/health") {
           sendJson(response, 200, { ...getHealth(), history: getHistoryHealth(), liveCountries: getLiveCountryHealth() });
@@ -109,31 +116,13 @@ export default defineConfig({
         skipWaiting: true,
         runtimeCaching: [
           {
-            urlPattern: ({ url }) => url.pathname.startsWith("/api/"),
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && /^\/api\/(?:enso|history|live-countries|v1\/(?:enso|history|countries|live-countries))$/.test(url.pathname),
             handler: "NetworkFirst",
             options: {
-              cacheName: "ninopulse-api-v4",
+              cacheName: "ninopulse-public-climate-v3",
               networkTimeoutSeconds: 10,
               cacheableResponse: { statuses: [0, 200] },
               expiration: { maxEntries: 20, maxAgeSeconds: 7 * 24 * 60 * 60 },
-            },
-          },
-          {
-            urlPattern: /^https:\/\/([a-z]+\.)?basemaps\.cartocdn\.com\//,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "ninopulse-map-tiles-v2",
-              cacheableResponse: { statuses: [0, 200] },
-              expiration: { maxEntries: 180, maxAgeSeconds: 14 * 24 * 60 * 60 },
-            },
-          },
-          {
-            urlPattern: /^https:\/\/([a-z]+\.)?tile\.openstreetmap\.org\//,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "ninopulse-map-fallback-v1",
-              cacheableResponse: { statuses: [0, 200] },
-              expiration: { maxEntries: 120, maxAgeSeconds: 7 * 24 * 60 * 60 },
             },
           },
         ],

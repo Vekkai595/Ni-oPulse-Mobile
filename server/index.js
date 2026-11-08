@@ -1,3 +1,4 @@
+import { alertsResponse } from "./alerts-service.js";
 import { createServer } from "node:http";
 import { createReadStream, existsSync, statSync } from "node:fs";
 import { extname, isAbsolute, join, relative, resolve } from "node:path";
@@ -56,6 +57,12 @@ async function handleApi(request, response, url) {
   }
   if (request.method !== "GET") {
     sendJson(response, 405, { ok: false, error: "Method not allowed. Use GET." }, "no-store", { Allow: "GET" });
+    return true;
+  }
+
+  if (url.pathname === "/api/alerts") {
+    const { status, body } = await alertsResponse(request.method, url.searchParams);
+    sendJson(response, status, body);
     return true;
   }
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { BarChart3, Download, Home, Languages, Laptop, Map, Moon, Settings, Sun, X, MapPin, ShieldCheck } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "next-themes";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { usePwaInstall } from "@/hooks/usePwaInstall";
@@ -10,18 +10,9 @@ export default function MobileBottomNav() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const closeButtonRef = useRef(null);
   const location = useLocation();
-  const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const { language, setLanguage, t } = useLanguage();
   const { canInstall, install } = usePwaInstall();
-
-  useEffect(() => {
-    if (location.pathname !== "/" || location.hash !== "#mapa") return;
-    const timer = window.setTimeout(() => {
-      document.getElementById("mapa")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 80);
-    return () => window.clearTimeout(timer);
-  }, [location.pathname, location.hash]);
 
   useEffect(() => {
     if (!settingsOpen) return undefined;
@@ -44,17 +35,9 @@ export default function MobileBottomNav() {
     };
   }, [settingsOpen]);
 
-  function openMap() {
-    if (location.pathname === "/" && location.hash === "#mapa") {
-      document.getElementById("mapa")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      return;
-    }
-    navigate({ pathname: "/", hash: "#mapa" });
-  }
-
-  const isHome = location.pathname === "/" && location.hash !== "#mapa";
-  const isMap = location.pathname === "/" && location.hash === "#mapa";
-  const isResearch = location.pathname === "/research";
+  const isHome = location.pathname === "/";
+  const isMap = location.pathname === "/map";
+  const isEnso = location.pathname === "/enso";
   const isLocalWeather = location.pathname === "/local-weather";
 
   return (
@@ -64,13 +47,13 @@ export default function MobileBottomNav() {
           <Home className="h-5 w-5" />
           <span>{t("nav.home")}</span>
         </Link>
-        <button type="button" onClick={openMap} className={`mobile-bottom-item ${isMap ? "mobile-bottom-item-active" : ""}`} aria-current={isMap ? "page" : undefined}>
+        <Link to="/map" className={`mobile-bottom-item ${isMap ? "mobile-bottom-item-active" : ""}`} aria-current={isMap ? "page" : undefined}>
           <Map className="h-5 w-5" />
           <span>{t("nav.map")}</span>
-        </button>
-        <Link to="/research" className={`mobile-bottom-item ${isResearch ? "mobile-bottom-item-active" : ""}`} aria-current={isResearch ? "page" : undefined}>
+        </Link>
+        <Link to="/enso" className={`mobile-bottom-item ${isEnso ? "mobile-bottom-item-active" : ""}`} aria-current={isEnso ? "page" : undefined}>
           <BarChart3 className="h-5 w-5" />
-          <span>{t("nav.research")}</span>
+          <span>{t("nav.enso")}</span>
         </Link>
         <Link to="/local-weather" className={`mobile-bottom-item ${isLocalWeather ? "mobile-bottom-item-active" : ""}`} aria-current={isLocalWeather ? "page" : undefined}>
           <MapPin className="h-5 w-5" />

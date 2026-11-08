@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Braces, Check, Copy, KeyRound, Server, ShieldAlert } from "lucide-react";
-import NavBar from "@/components/elnino/NavBar";
 import FooterSection from "@/components/elnino/FooterSection";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { resolveApiBaseUrl } from "@/lib/runtime";
@@ -24,8 +23,7 @@ export default function ApiDocsPage() {
   }
   return (
     <div className="min-h-screen bg-background">
-      <NavBar />
-      <main id="main-content" className="mx-auto max-w-6xl px-4 pb-16 pt-28">
+      <main id="main-content" className="mx-auto max-w-6xl px-4 pb-16 pt-8">
         <header className="max-w-3xl"><p className="section-kicker">{t("kicker.developer")}</p><h1 className="section-title text-4xl sm:text-6xl">{t("api.title")}</h1><p className="section-description">{t("api.subtitle")}</p></header>
 
         <div className="mt-10 grid gap-5 lg:grid-cols-[1.2fr_.8fr]">

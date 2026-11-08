@@ -13,7 +13,6 @@ import {
   Target,
 } from "lucide-react";
 
-import NavBar from "@/components/elnino/NavBar";
 import FooterSection from "@/components/elnino/FooterSection";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -46,11 +45,10 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <NavBar />
 
       <main
         id="main-content"
-        className="mx-auto max-w-6xl px-4 pb-16 pt-28"
+        className="mx-auto max-w-6xl px-4 pb-16 pt-8"
       >
         <header className="max-w-3xl">
           <p className="section-kicker">NIÑOPULSE GLOBAL</p>

@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { Capacitor } from "@capacitor/core";
+import { Capacitor, SystemBars, SystemBarsStyle } from "@capacitor/core";
 import { App as CapacitorApp } from "@capacitor/app";
 import { Keyboard } from "@capacitor/keyboard";
-import { SplashScreen } from "@capacitor/splash-screen";
+import { useTheme } from "next-themes";
 import { useLocation, useNavigate } from "react-router-dom";
 import { queryClientInstance } from "@/lib/query-client";
 
@@ -21,6 +21,7 @@ function setViewportVariables() {
 export default function AppRuntime() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     setViewportVariables();
@@ -42,8 +43,15 @@ export default function AppRuntime() {
   }, []);
 
   useEffect(() => {
-    getScrollRoot()?.scrollTo?.({ top: 0, left: 0, behavior: "instant" });
-  }, [location.pathname]);
+    if (!location.hash) getScrollRoot()?.scrollTo?.({ top: 0, left: 0, behavior: "instant" });
+  }, [location.pathname, location.hash]);
+
+  useEffect(() => {
+    if (Capacitor.isNativePlatform() && resolvedTheme) {
+      const style = resolvedTheme === "dark" ? SystemBarsStyle.Dark : SystemBarsStyle.Light;
+      SystemBars.setStyle({ style }).catch(() => undefined);
+    }
+  }, [resolvedTheme]);
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return undefined;
@@ -65,7 +73,7 @@ export default function AppRuntime() {
       handles.push(await CapacitorApp.addListener("appStateChange", ({ isActive }) => {
         if (isActive) {
           setViewportVariables();
-          queryClientInstance.invalidateQueries({ refetchType: "active" });
+          queryClientInstance.refetchQueries({ type: "active", stale: true });
         }
       }));
       handles.push(await CapacitorApp.addListener("backButton", () => {
@@ -77,7 +85,8 @@ export default function AppRuntime() {
           return;
         }
         if (location.pathname !== "/") {
-          navigate(-1);
+          if (window.history.state?.idx > 0) navigate(-1);
+          else navigate("/", { replace: true });
           return;
         }
         const scrollRoot = getScrollRoot();
@@ -88,9 +97,7 @@ export default function AppRuntime() {
         CapacitorApp.exitApp();
       }));
 
-      window.requestAnimationFrame(() => {
-        window.setTimeout(() => SplashScreen.hide().catch(() => undefined), 120);
-      });
+
     };
 
     setup().catch((error) => console.warn("Native runtime setup failed", error));

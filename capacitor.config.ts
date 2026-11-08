@@ -10,18 +10,18 @@ const config: CapacitorConfig = {
     androidScheme: "https",
   },
   android: {
-    adjustMarginsForEdgeToEdge: "auto",
     allowMixedContent: false,
     backgroundColor: "#08121f",
   },
   plugins: {
+    SystemBars: { insetsHandling: "css", initialViewportFitValueHint: "cover" },
     Keyboard: {
       resize: KeyboardResize.Native,
       resizeOnFullScreen: false,
     },
     SplashScreen: {
-      launchAutoHide: false,
-      launchShowDuration: 3000,
+      launchAutoHide: true,
+      launchShowDuration: 300,
       launchFadeOutDuration: 250,
       backgroundColor: "#08121fff",
       androidSplashResourceName: "splash",

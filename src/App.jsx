@@ -1,61 +1,60 @@
-import React, { Suspense, lazy } from "react";
+import { Suspense, lazy } from "react";
 import { Capacitor } from "@capacitor/core";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { queryClientInstance } from "@/lib/query-client";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { PreferencesProvider } from "@/contexts/PreferencesContext";
-import Home from "@/pages/Home";
+import { PlacesProvider } from "@/contexts/PlacesContext";
 import MobileBottomNav from "@/components/elnino/MobileBottomNav";
+import NavBar from "@/components/elnino/NavBar";
+import WatchMonitor from "@/components/pulse/WatchMonitor";
 import AppRuntime from "@/components/system/AppRuntime";
 import ConnectivityBanner from "@/components/system/ConnectivityBanner";
 import PwaUpdatePrompt from "@/components/system/PwaUpdatePrompt";
+import Home from "@/pages/Home";
 
-const AboutPage = lazy(() => import("@/pages/AboutPage"));
-const ResearchPage = lazy(() => import("@/pages/ResearchPage"));
-const ApiDocsPage = lazy(() => import("@/pages/ApiDocsPage"));
-const PrivacyPage = lazy(() => import("@/pages/PrivacyPage"));
-const LocalWeatherPage = lazy(() => import("@/pages/LocalWeather"));
+const About = lazy(() => import("@/pages/AboutPage"));
+const Research = lazy(() => import("@/pages/ResearchPage"));
+const Api = lazy(() => import("@/pages/ApiDocsPage"));
+const Privacy = lazy(() => import("@/pages/PrivacyPage"));
+const Earth = lazy(() => import("@/pages/EarthPage"));
+const Enso = lazy(() => import("@/pages/EnsoPage"));
+const Alerts = lazy(() => import("@/pages/AlertsPage"));
+const Explore = lazy(() => import("@/pages/ExplorePage"));
+const LocalWeather = lazy(() => import("@/pages/LocalWeather"));
 
-function PageLoader() {
-  return (
-    <div className="grid min-h-[100dvh] place-items-center bg-background px-4 text-sm text-muted-foreground" role="status">
-      <span className="loading-pulse">NiñoPulse Global…</span>
-    </div>
-  );
+export default function App() {
+  return <QueryClientProvider client={queryClientInstance}>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <LanguageProvider><PreferencesProvider><PlacesProvider><BrowserRouter>
+        <AppRuntime /><WatchMonitor />
+        <div id="app-scroll-root" className="app-viewport">
+          <NavBar />
+          <ConnectivityBanner />
+          <Suspense fallback={<div className="app-pages"><div className="np-content loading-pulse" role="status">NiñoPulse Global…</div></div>}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route element={<div className="app-pages"><Outlet /></div>}>
+                <Route path="/local-weather" element={<LocalWeather />} />
+                <Route path="/map" element={<Earth />} />
+                <Route path="/enso" element={<Enso />} />
+                <Route path="/alerts" element={<Alerts />} />
+                <Route path="/explore" element={<Explore />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/research" element={<Research />} />
+                <Route path="/api-docs" element={<Api />} />
+                <Route path="/privacy" element={<Privacy />} />
+              </Route>
+              <Route path="/explore/regions" element={<Navigate to="/#paises" replace />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+          {!Capacitor.isNativePlatform() && <PwaUpdatePrompt />}
+          <MobileBottomNav />
+        </div>
+      </BrowserRouter></PlacesProvider></PreferencesProvider></LanguageProvider>
+    </ThemeProvider>
+  </QueryClientProvider>;
 }
-
-function App() {
-  return (
-    <QueryClientProvider client={queryClientInstance}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-        <LanguageProvider>
-          <PreferencesProvider>
-            <Router>
-              <AppRuntime />
-              <div id="app-scroll-root" className="app-viewport">
-                <ConnectivityBanner />
-                <Suspense fallback={<PageLoader />}>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/about" element={<AboutPage />} />
-                    <Route path="/research" element={<ResearchPage />} />
-                    <Route path="/api-docs" element={<ApiDocsPage />} />
-                    <Route path="/privacy" element={<PrivacyPage />} />
-                    <Route path="/local-weather" element={<LocalWeatherPage />} />
-                    <Route path="*" element={<Home />} />
-                  </Routes>
-                </Suspense>
-                {!Capacitor.isNativePlatform() && <PwaUpdatePrompt />}
-                <MobileBottomNav />
-              </div>
-            </Router>
-          </PreferencesProvider>
-        </LanguageProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
-  );
-}
-
-export default App;

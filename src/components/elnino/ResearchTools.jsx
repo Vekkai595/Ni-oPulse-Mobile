@@ -8,7 +8,7 @@ import { shareDashboardImage } from "@/services/shareService";
 import { resolveApiBaseUrl } from "@/lib/runtime";
 
 export default function ResearchTools() {
-  const { data } = useEnsoData();
+  const { data, hasData } = useEnsoData();
   const { language, t } = useLanguage();
   const [status, setStatus] = useState("");
 
@@ -41,7 +41,7 @@ export default function ResearchTools() {
             <p className="section-description">{t("tools.subtitle")}</p>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap lg:justify-end">
-            {tools.map(({ label, icon: Icon, action }) => <button key={label} type="button" onClick={action} className="tool-button"><Icon className="h-4 w-4" />{label}</button>)}
+            {tools.map(({ label, icon: Icon, action }) => <button key={label} type="button" onClick={action} disabled={!hasData} className="tool-button disabled:opacity-60"><Icon className="h-4 w-4" />{label}</button>)}
             <button type="button" onClick={() => run(() => shareDashboardImage({ title: "NiñoPulse Global", text: t("hero.description"), fallbackUrl: resolveApiBaseUrl() || window.location.origin }), t("tools.shareSuccess"))} className="tool-button"><Share2 className="h-4 w-4" />{t("tools.shareImage")}</button>
             <Link to="/research" className="tool-button"><Download className="h-4 w-4" />{t("tools.research")}</Link>
             <Link to="/api-docs" className="tool-button"><Braces className="h-4 w-4" />{t("tools.api")}</Link>

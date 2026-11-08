@@ -16,18 +16,15 @@ export function readEnvFile(path = ".env.android") {
 }
 
 export function resolveAndroidApiBase(env = process.env) {
-  const fileValues = readEnvFile();
-  return String(env.VITE_API_BASE_URL || fileValues.VITE_API_BASE_URL || "").replace(/\/+$/, "");
+  const value = String(env.VITE_API_BASE_URL || readEnvFile().VITE_API_BASE_URL || "").trim();
+  return value ? assertAndroidApiBase(value) : "";
 }
 
-export function assertAndroidApiBase(apiBase) {
-  const invalid = !/^https:\/\//i.test(apiBase) || /your-project|example\.invalid/i.test(apiBase);
-  if (invalid) {
-    throw new Error([
-      "Android build stopped: VITE_API_BASE_URL must be a real HTTPS deployment.",
-      "Copy .env.android.example to .env.android and replace the placeholder with your Vercel domain.",
-      "Example: VITE_API_BASE_URL=https://ninopulse-global.vercel.app",
-    ].join("\n"));
+export function assertAndroidApiBase(value) {
+  const url = new URL(value);
+  if (url.protocol !== "https:" || url.username || url.password || url.search || url.hash ||
+      url.pathname !== "/" || /your-|example\.invalid/i.test(url.hostname)) {
+    throw new Error("VITE_API_BASE_URL must be a real HTTPS origin or empty.");
   }
-  return apiBase;
+  return url.origin;
 }
