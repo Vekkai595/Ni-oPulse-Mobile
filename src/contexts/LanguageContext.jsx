@@ -4,9 +4,9 @@ const LanguageContext = createContext(null);
 
 const messages = {
   pt: {
-    nav: { home: "Início", map: "Mapa", enso: "ENSO", research: "Pesquisa", about: "Sobre", api: "API", localWeather: "Clima local", privacy: "Privacidade" },
+    nav: { home: "Início", map: "Mapa", enso: "ENSO", research: "Pesquisa", about: "Sobre", api: "API", localWeather: "Meu Clima", privacy: "Privacidade", alerts: "Alertas", explore: "Explorar" },
     common: {
-      language: "Idioma", theme: "Tema", light: "Claro", dark: "Escuro", system: "Sistema", menu: "Menu",
+      language: "Idioma", theme: "Tema", light: "Claro", dark: "Escuro", system: "Sistema", systemTheme: "Usar tema do sistema", menu: "Menu",
       live: "Dados NOAA ao vivo", fallback: "Fallback NOAA ativo", updated: "Atualizado", refresh: "Atualizar dados",
       install: "Instalar app", share: "Compartilhar imagem", close: "Fechar", source: "Fonte", official: "Oficial",
       experimental: "Experimental", educational: "Educacional", download: "Baixar", enabled: "Ativado", disabled: "Desativado",
@@ -142,9 +142,9 @@ const messages = {
     footer: { transparency: "Transparência dos dados", created: "Criado por Samuel Borba Cordeiro para fins educacionais", rights: "Monitoramento oficial + conteúdo educacional" },
   },
   en: {
-    nav: { home: "Home", map: "Map", enso: "ENSO", research: "Research", about: "About", api: "API", localWeather: "Local weather", privacy: "Privacy" },
+    nav: { home: "Home", map: "Map", enso: "ENSO", research: "Research", about: "About", api: "API", localWeather: "My Weather", privacy: "Privacy", alerts: "Alerts", explore: "Explore" },
     common: {
-      language: "Language", theme: "Theme", light: "Light", dark: "Dark", system: "System", menu: "Menu",
+      language: "Language", theme: "Theme", light: "Light", dark: "Dark", system: "System", systemTheme: "Use system theme", menu: "Menu",
       live: "Live NOAA data", fallback: "NOAA fallback active", updated: "Updated", refresh: "Refresh data",
       install: "Install app", share: "Share image", close: "Close", source: "Source", official: "Official",
       experimental: "Experimental", educational: "Educational", download: "Download", enabled: "Enabled", disabled: "Disabled",
@@ -255,10 +255,13 @@ function getByPath(object, path) {
 }
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState(() => localStorage.getItem("ninopulse-language") || "pt");
+  const [language, setLanguage] = useState(() => {
+    try { return localStorage.getItem("ninopulse-language") === "en" ? "en" : "pt"; }
+    catch { return "pt"; }
+  });
 
   useEffect(() => {
-    localStorage.setItem("ninopulse-language", language);
+    try { localStorage.setItem("ninopulse-language", language); } catch { /* Session-only in restricted browsers. */ }
     document.documentElement.lang = language === "pt" ? "pt-BR" : "en";
   }, [language]);
 

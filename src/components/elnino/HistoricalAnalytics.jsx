@@ -36,7 +36,7 @@ export default function HistoricalAnalytics() {
   const right = episodes.find((item) => item.id === rightId);
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-14" id="historico">
+    <section className="np-panel" id="historico">
       <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-3xl">
           <p className="section-kicker">{t("kicker.archive")}</p>
@@ -51,6 +51,8 @@ export default function HistoricalAnalytics() {
         </div>
       </div>
 
+      {!dataset && <p className="np-note mb-3" role="status">{isLoading ? (language === "pt" ? "Consultando o histórico oficial…" : "Checking official history…") : (language === "pt" ? "Histórico da NOAA indisponível." : "NOAA history unavailable.")}</p>}
+      {dataset && <a href={dataset.url} target="_blank" rel="noreferrer" className="np-link mb-3">NOAA/CPC · {dataset.key.toUpperCase()}</a>}
       <div className="grid gap-5 lg:grid-cols-[1.35fr_.65fr]">
         <div className="surface-card min-w-0 p-4 sm:p-6">
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -60,7 +62,7 @@ export default function HistoricalAnalytics() {
           <div className="historical-chart h-[320px] w-full sm:h-[400px]">
             {isLoading && !dataset ? (
               <div className="grid h-full place-items-center"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
-            ) : (
+            ) : dataset ? (
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData} margin={{ top: 8, right: 10, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.16} />
@@ -73,7 +75,7 @@ export default function HistoricalAnalytics() {
                   <Line type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={2.5} dot={false} activeDot={{ r: 5 }} isAnimationActive={chartData.length < 300} />
                 </LineChart>
               </ResponsiveContainer>
-            )}
+            ) : null}
           </div>
           {(isFallback || data.condensed) && <p className="mt-4 rounded-xl border border-accent/25 bg-accent/10 p-3 text-xs leading-5 text-muted-foreground">{t("analytics.fallback")}</p>}
           <p className="mt-4 text-xs leading-5 text-muted-foreground">{t("analytics.note")} {isFetching ? "…" : ""}</p>

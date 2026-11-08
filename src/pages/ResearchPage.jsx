@@ -1,6 +1,5 @@
 import React from "react";
 import { Activity, Database, ExternalLink, Gauge, ShieldCheck, Thermometer } from "lucide-react";
-import NavBar from "@/components/elnino/NavBar";
 import FooterSection from "@/components/elnino/FooterSection";
 import ResearchTools from "@/components/elnino/ResearchTools";
 import { useEnsoData } from "@/hooks/useEnsoData";
@@ -14,8 +13,7 @@ export default function ResearchPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <NavBar />
-      <main id="main-content" className="pb-12 pt-28">
+      <main id="main-content" className="pb-12 pt-8">
         <header className="mx-auto max-w-7xl px-3 sm:px-4">
           <p className="section-kicker">{t("kicker.technical")}</p>
           <h1 className="section-title text-4xl sm:text-6xl">{t("research.title")}</h1>

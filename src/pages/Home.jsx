@@ -1,5 +1,5 @@
-import React, { Suspense, lazy, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { Suspense, lazy, useLayoutEffect, useMemo, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
   Activity,
   ArrowUpRight,
@@ -8,16 +8,17 @@ import {
   ChevronRight,
   Database,
   Globe2,
+  Map,
   MapPin,
   RefreshCw,
   Search,
   ShieldCheck,
   ThermometerSun,
 } from "lucide-react";
-import NavBar from "@/components/elnino/NavBar";
 import FilterBar from "@/components/elnino/FilterBar";
 import CountryPanel from "@/components/elnino/CountryPanel";
 import FooterSection from "@/components/elnino/FooterSection";
+import { usePreferences } from "@/contexts/PreferencesContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useEnsoData } from "@/hooks/useEnsoData";
 import { countries, riskColors } from "@/lib/elNinoData";
@@ -48,9 +49,17 @@ export default function Home() {
   const [riskFilter, setRiskFilter] = useState("all");
   const [threatFilter, setThreatFilter] = useState(null);
   const [query, setQuery] = useState("");
-
+  const [savedOnly, setSavedOnly] = useState(false);
+  const { favorites } = usePreferences();
+  const { hash, key } = useLocation();
   const { language, t } = useLanguage();
   const { data, isFallback, isFetching, refetch } = useEnsoData();
+
+  useLayoutEffect(() => {
+    if (["#mapa", "#paises", "#previsao"].includes(hash)) {
+      document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "instant", block: "start" });
+    }
+  }, [hash, key]);
 
   const localizedCountries = useMemo(
     () => localizeCountries(countries, language),
@@ -69,9 +78,9 @@ export default function Home() {
           .toLowerCase()
           .includes(normalized);
 
-      return riskMatch && threatMatch && queryMatch;
+      return riskMatch && threatMatch && queryMatch && (!savedOnly || favorites.includes(country.id));
     });
-  }, [localizedCountries, query, riskFilter, threatFilter]);
+  }, [localizedCountries, query, riskFilter, threatFilter, savedOnly, favorites]);
 
   const selectedSeason = data.forecast?.selectedSeason;
   const regions = data.current?.weeklySst?.regions || {};
@@ -84,10 +93,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background mobile-home-shell">
-      <NavBar />
 
-      <main id="main-content" className="mobile-main pb-6">
-        <section className="mobile-hero px-3 pt-24 sm:px-4">
+      <main id="main-content" className="mobile-main pb-6" tabIndex={-1}>
+        <section className="mobile-hero px-3 sm:px-4">
           <div className="mx-auto max-w-md rounded-[2rem] border border-border bg-card p-5 shadow-sm">
             <div className="flex items-center justify-between gap-3">
               <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-primary">
@@ -101,7 +109,7 @@ export default function Home() {
                     : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                 }`}
               >
-                {isFallback ? t("common.fallback") : t("common.live")}
+                {isFallback ? (language === "pt" ? "Sem consulta recente" : "No recent lookup") : "NOAA/CPC"}
               </span>
             </div>
 
@@ -111,9 +119,14 @@ export default function Home() {
 
             <p className="mt-4 text-sm leading-6 text-muted-foreground">
               {language === "pt"
-                ? "Monitor ENSO otimizado para celular: dados oficiais, mapa interativo e cartões rápidos para consulta em sala de aula."
-                : "Mobile-first ENSO monitor: official data, an interactive map and quick cards for classroom use."}
+                ? "Acompanhe a fase atual de El Niño e La Niña e as previsões sazonais da NOAA."
+                : "Track the current El Niño and La Niña phase and NOAA’s seasonal forecasts."}
             </p>
+
+            <Link to="/local-weather" className="primary-action mt-4">
+              <MapPin className="h-4 w-4" aria-hidden="true" />
+              {language === "pt" ? "Ver previsão da minha cidade" : "See my city’s forecast"}
+            </Link>
 
             <div className="mt-5 grid grid-cols-2 gap-3">
               <MetricCard
@@ -142,18 +155,18 @@ export default function Home() {
             </div>
 
             <div className="mt-5 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-              <a href="#mapa" className="mobile-pill-primary">
-                <MapPin className="h-4 w-4" /> {t("nav.map")}
-              </a>
+              <Link to="/#mapa" className="mobile-pill">
+                <Map className="h-4 w-4" /> {language === "pt" ? "Mapa de impactos" : "Impact map"}
+              </Link>
 
-              <a href="#paises" className="mobile-pill">
+              <Link to="/#paises" className="mobile-pill">
                 <Globe2 className="h-4 w-4" />{" "}
                 {language === "pt" ? "Países" : "Countries"}
-              </a>
+              </Link>
 
-              <a href="#previsao" className="mobile-pill">
+              <Link to="/#previsao" className="mobile-pill">
                 <BarChart3 className="h-4 w-4" /> ENSO
-              </a>
+              </Link>
 
               <Link to="/research" className="mobile-pill">
                 <Database className="h-4 w-4" /> {t("nav.research")}
@@ -178,8 +191,8 @@ export default function Home() {
             />
 
             <MiniStat
-              value={seasonLabel(selectedSeason?.season, language).split(" · ")[0] || "—"}
-              label={language === "pt" ? "janela" : "season"}
+              value={selectedSeason?.season || "—"}
+              label={language === "pt" ? "trimestre" : "season"}
             />
           </div>
         </section>
@@ -254,6 +267,13 @@ export default function Home() {
               </button>
             </div>
 
+            {seasons.length === 0 && (
+              <p className="mt-4 text-sm text-muted-foreground" role="status">
+                {isFetching
+                  ? (language === "pt" ? "Consultando a NOAA…" : "Checking NOAA…")
+                  : (language === "pt" ? "Previsão sazonal indisponível." : "Seasonal forecast unavailable.")}
+              </p>
+            )}
             <div className="mt-4 space-y-2">
               {seasons.map((item) => (
                 <div
@@ -292,6 +312,9 @@ export default function Home() {
                 <h2 className="font-display text-2xl font-black tracking-tight">
                   {t("countries.title")}
                 </h2>
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                  {language === "pt" ? "Perfis educativos sobre os impactos históricos de El Niño e La Niña." : "Educational profiles of past El Niño and La Niña impacts."}
+                </p>
               </div>
 
               <span className="shrink-0 text-xs font-bold text-muted-foreground">
@@ -310,8 +333,9 @@ export default function Home() {
               />
             </label>
 
+            {favorites.length > 0 && <button type="button" className="filter-chip mt-2" aria-pressed={savedOnly} onClick={() => setSavedOnly((value) => !value)}>{language === "pt" ? "Ver favoritos" : "Show favorites"}</button>}
             <div className="mt-3 grid gap-3">
-              {visibleCountries.slice(0, 12).map((country) => (
+              {visibleCountries.map((country) => (
                 <button
                   key={country.id}
                   type="button"
@@ -349,13 +373,6 @@ export default function Home() {
               ))}
             </div>
 
-            {visibleCountries.length > 12 && (
-              <p className="mt-3 rounded-2xl bg-secondary/60 p-3 text-center text-xs text-muted-foreground">
-                {language === "pt"
-                  ? `Mostrando 12 de ${visibleCountries.length}. Use busca/filtros para refinar.`
-                  : `Showing 12 of ${visibleCountries.length}. Use search/filters to refine.`}
-              </p>
-            )}
           </div>
         </section>
 
@@ -369,8 +386,8 @@ export default function Home() {
               <div>
                 <h2 className="font-display text-xl font-black">
                   {language === "pt"
-                    ? "Painel pronto para avaliação"
-                    : "Dashboard ready for review"}
+                    ? "Como ler os perfis"
+                    : "How to read these profiles"}
                 </h2>
 
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">

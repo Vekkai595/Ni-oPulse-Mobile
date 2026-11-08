@@ -42,6 +42,7 @@ let lastValid = null;
 let inFlight = null;
 
 function finiteOrNull(value) {
+  if (value == null || value === "") return null;
   const number = Number(value);
   return Number.isFinite(number) ? number : null;
 }
@@ -124,7 +125,7 @@ export function normalizeForecastResponse(payload, generatedAt = new Date().toIS
         timezoneAbbreviation: row.timezone_abbreviation || "GMT",
       },
       current: {
-        time: row.current.time || generatedAt,
+        time: row.current.time ?? null,
         intervalSeconds: finiteOrNull(row.current.interval),
         temperature: finiteOrNull(row.current.temperature_2m),
         apparentTemperature: finiteOrNull(row.current.apparent_temperature),
@@ -176,7 +177,7 @@ async function fetchJson(fetchImpl) {
 export async function getLiveCountries({ force = false, fetchImpl = fetch } = {}) {
   const now = Date.now();
   if (!force && cache && now - cache.timestamp < CACHE_MS) return cache.data;
-  if (!force && inFlight) return inFlight;
+  if (inFlight) return inFlight;
 
   inFlight = (async () => {
     try {

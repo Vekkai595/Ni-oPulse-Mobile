@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Bell, Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudRain, CloudSun, Droplets,
+  Cloud, CloudDrizzle, CloudFog, CloudLightning, CloudRain, CloudSun, Droplets,
   Gauge, MapPin, RefreshCw, Snowflake, Star, Sun, Thermometer, Wheat, Wind, X,
 } from "lucide-react";
 import { riskColors } from "@/lib/elNinoData";
@@ -18,7 +18,7 @@ export default function CountryPanel({ country, onClose }) {
   const isMobile = useIsMobile();
   const { data } = useEnsoData();
   const { countryMap, isFetching, isStale, refetch } = useLiveCountries();
-  const { isFavorite, toggleFavorite, alertSettings, setAlertSettings } = usePreferences();
+  const { isFavorite, toggleFavorite } = usePreferences();
   const dialogRef = useRef(null);
   const previousFocusRef = useRef(null);
   const scenario = useMemo(() => getCountryScenario(country, data, language), [country, data, language]);
@@ -60,11 +60,6 @@ export default function CountryPanel({ country, onClose }) {
   if (!country) return null;
   const color = riskColors[country.nivelDeRisco];
   const favorite = isFavorite(country.id);
-  const countryAlert = alertSettings.countries.includes(country.id);
-
-  function toggleCountryAlert() {
-    setAlertSettings((current) => ({ ...current, countries: countryAlert ? current.countries.filter((id) => id !== country.id) : [...current.countries, country.id] }));
-  }
 
   return (
     <AnimatePresence>
@@ -86,7 +81,6 @@ export default function CountryPanel({ country, onClose }) {
           {isMobile && <div className="flex justify-center pt-2"><span className="h-1.5 w-12 rounded-full bg-muted-foreground/25" /></div>}
           <div className="flex items-center justify-end gap-2 p-3">
             <button type="button" onClick={() => toggleFavorite(country.id)} className={`control-button min-w-11 ${favorite ? "text-primary" : ""}`} aria-pressed={favorite}><Star className={`h-4 w-4 ${favorite ? "fill-current" : ""}`} /><span className="hidden min-[390px]:inline">{favorite ? t("common.removeFavorite") : t("common.favorite")}</span></button>
-            <button type="button" onClick={toggleCountryAlert} className={`control-button h-11 w-11 px-0 ${countryAlert ? "text-primary" : ""}`} aria-label={t("panel.alert")} title={t("panel.alert")} aria-pressed={countryAlert}><Bell className={`h-4 w-4 ${countryAlert ? "fill-current" : ""}`} /></button>
             <button type="button" onClick={onClose} className="control-button h-11 w-11 px-0" aria-label={t("common.close")}><X className="h-5 w-5" /></button>
           </div>
         </div>
@@ -109,14 +103,14 @@ export default function CountryPanel({ country, onClose }) {
               <MiniMetric label={t("panel.confidence")} value={country.confianca} />
             </div>
 
-            <div className="mt-5 rounded-2xl border border-primary/20 bg-primary/10 p-4">
-              <div className="flex items-center justify-between gap-3"><p className="text-xs font-bold uppercase tracking-wider text-primary">{t("panel.currentScenario")}</p><span className="rounded-full bg-background/70 px-2.5 py-1 text-xs font-bold">{scenario.probability}%</span></div>
+            {data.forecast?.selectedSeason && <div className="mt-5 rounded-2xl border border-primary/20 bg-primary/10 p-4">
+              <div className="flex items-center justify-between gap-3"><p className="text-xs font-bold uppercase tracking-wider text-primary">{t("panel.currentScenario")}</p><span className="rounded-full bg-background/70 px-2.5 py-1 text-xs font-bold">{scenario.probability}% · {language === "pt" ? "fase global" : "global phase"}</span></div>
               <p className="mt-2 font-display text-lg font-bold">{scenario.label}</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">{scenario.summary}</p>
               <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground"><span>{t("panel.scenarioSignal")}</span><strong className="text-foreground">{scenario.signal}/100</strong></div>
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-background"><div className="h-full rounded-full bg-primary" style={{ width: `${scenario.signal}%` }} /></div>
               <p className="mt-3 text-[11px] leading-5 text-muted-foreground">{scenario.disclaimer}</p>
-            </div>
+            </div>}
 
             <div className="mt-6 flex flex-wrap gap-2">{country.ameacas.map((threat) => <span key={threat} className="rounded-lg bg-secondary px-2.5 py-1.5 text-xs">{t(`threats.${threat}`)}</span>)}</div>
 
@@ -161,7 +155,7 @@ function LiveWeatherSection({ live, isFetching, isStale, refetch, language, t })
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${isStale ? "bg-amber-500/10 text-amber-700 dark:text-amber-400" : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"}`}><span className={`h-1.5 w-1.5 rounded-full ${isStale ? "bg-amber-500" : "animate-pulse bg-emerald-500"}`} />{isStale ? t("live.cached") : t("live.active")}</span>
+              <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${isStale ? "bg-amber-500/10 text-amber-700 dark:text-amber-400" : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"}`}><span className={`h-1.5 w-1.5 rounded-full ${isStale ? "bg-amber-500" : "animate-pulse bg-emerald-500"}`} />{isStale ? t("live.cached") : (language === "pt" ? "Dados de modelo" : "Model data")}</span>
               <span className="text-xs text-muted-foreground">{locationName}</span>
             </div>
             <h3 className="mt-3 font-display text-xl font-bold">{t("live.currentConditions")}</h3>
@@ -180,7 +174,7 @@ function LiveWeatherSection({ live, isFetching, isStale, refetch, language, t })
         <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <LiveDetail icon={Thermometer} label={t("live.feelsLike")} value={`${roundWeatherValue(live.current.apparentTemperature)}°C`} />
           <LiveDetail icon={Droplets} label={t("live.humidity")} value={`${roundWeatherValue(live.current.humidity)}%`} />
-          <LiveDetail icon={CloudRain} label={t("live.precipitation")} value={`${Number(live.current.precipitation ?? 0).toFixed(1)} mm`} />
+          <LiveDetail icon={CloudRain} label={t("live.precipitation")} value={live.current.precipitation == null ? "—" : `${Number(live.current.precipitation).toFixed(1)} mm`} />
           <LiveDetail icon={Wind} label={t("live.wind")} value={`${roundWeatherValue(live.current.windSpeed)} km/h`} />
         </div>
 

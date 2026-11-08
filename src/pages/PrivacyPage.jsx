@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ShieldCheck, Database, Globe2, Mail, ArrowLeft } from "lucide-react";
-import NavBar from "@/components/elnino/NavBar";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const content = {
@@ -9,7 +8,7 @@ const content = {
     back: "Voltar ao início",
     eyebrow: "Privacidade e transparência",
     title: "Política de Privacidade — NiñoPulse Global",
-    updated: "Última atualização: 28 de junho de 2026",
+    updated: "Última atualização: 7 de novembro de 2026",
     intro:
       "O NiñoPulse Global é uma plataforma educacional de monitoramento climático focada em ENSO, El Niño, La Niña, dados meteorológicos, mapas e indicadores climáticos. Esta política explica como o app/site lida com informações dos usuários.",
     sections: [
@@ -23,13 +22,13 @@ const content = {
         icon: Database,
         title: "2. Dados usados para funcionamento",
         text:
-          "O app pode usar dados técnicos básicos necessários para funcionar, como conexão com a internet, carregamento de mapas, gráficos e dados climáticos. Preferências como idioma, tema e favoritos podem ficar salvas localmente no próprio dispositivo/navegador do usuário.",
+          "Idioma, tema, cidades salvas, previsões recentes e preferências de acompanhamento ficam no dispositivo. Meu Clima guarda até oito amostras diárias por cidade, para até 24 locais. Para apagar essas informações, limpe os dados do app no Android ou do site no navegador.",
       },
       {
         icon: Globe2,
         title: "3. Fontes externas e APIs",
         text:
-          "O NiñoPulse Global exibe informações climáticas e meteorológicas obtidas de fontes externas, incluindo dados públicos da NOAA/CPC, Open-Meteo e serviços de consulta de países, estados e cidades. Ao pesquisar ou selecionar uma cidade, o nome da cidade/estado/país pode ser enviado a APIs externas para localizar coordenadas e retornar a previsão do tempo. O NiñoPulse não usa esses dados para identificar o usuário.",
+          "Os termos da busca e as coordenadas consultadas vão ao Open-Meteo. O ponto público de uma cidade pode ser enviado ao serviço hospedado do NiñoPulse e ao NWS para consultar avisos. No Brasil, o app cruza o ponto da cidade com o feed público da Defesa Civil. A NOAA/CPC fornece dados climáticos. Provedores podem receber o IP e outros dados técnicos de conexão.",
       },
       {
         icon: ShieldCheck,
@@ -39,9 +38,9 @@ const content = {
       },
       {
         icon: ShieldCheck,
-        title: "5. Localização, anúncios e login",
+        title: "5. Localização e notificações",
         text:
-          "O app não pede localização GPS precisa, não possui login obrigatório e não exibe anúncios nesta versão. A consulta de clima local acontece pela cidade escolhida manualmente pelo usuário.",
+          "Ao tocar em Usar localização, o app explica o uso e solicita permissão. Envia ao Open-Meteo coordenadas arredondadas a duas casas decimais e guarda essa posição só durante a sessão. A busca manual funciona sem essa permissão. Notificações são opcionais e dependem de verificações feitas com o app aberto. Revogue permissões nas configurações do sistema ou navegador.",
       },
       {
         icon: ShieldCheck,
@@ -63,7 +62,7 @@ const content = {
     back: "Back to home",
     eyebrow: "Privacy and transparency",
     title: "Privacy Policy — NiñoPulse Global",
-    updated: "Last updated: June 28, 2026",
+    updated: "Last updated: November 7, 2026",
     intro:
       "NiñoPulse Global is an educational climate monitoring platform focused on ENSO, El Niño, La Niña, weather data, maps and climate indicators. This policy explains how the app/site handles user information.",
     sections: [
@@ -77,13 +76,13 @@ const content = {
         icon: Database,
         title: "2. Data used for functionality",
         text:
-          "The app may use basic technical data needed to function, such as internet connection, map loading, charts and climate data. Preferences such as language, theme and favorites may be stored locally on the user's own device/browser.",
+          "Language, theme, saved cities, recent forecasts, and follow preferences stay on the device. My Weather keeps up to eight daily snapshots per city, for up to 24 locations. To erase this information, clear app data on Android or site data in your browser.",
       },
       {
         icon: Globe2,
         title: "3. External sources and APIs",
         text:
-          "NiñoPulse Global displays climate and weather information obtained from external sources, including public NOAA/CPC data, Open-Meteo and country/state/city lookup services. When searching for or selecting a city, the city/state/country name may be sent to external APIs to locate coordinates and return weather forecasts. NiñoPulse does not use this information to identify the user.",
+          "Search terms and selected coordinates go to Open-Meteo. A public city point may go to the hosted NiñoPulse service and NWS for alerts. For Brazil, the app matches the point against the public Civil Defense feed. Climate indicators come from NOAA/CPC. Providers may receive the IP address and technical connection data.",
       },
       {
         icon: ShieldCheck,
@@ -93,9 +92,9 @@ const content = {
       },
       {
         icon: ShieldCheck,
-        title: "5. Location, ads and login",
+        title: "5. Location and notifications",
         text:
-          "The app does not request precise GPS location, does not require login and does not display ads in this version. Local weather search works through the city selected manually by the user.",
+          "When you select Use location, the app explains its use and asks for permission. It sends coordinates rounded to two decimal places to Open-Meteo and keeps this position only for the session. Manual search works without location permission. Optional notifications rely on checks while the app is open. Revoke permissions in your system or browser settings.",
       },
       {
         icon: ShieldCheck,
@@ -121,8 +120,7 @@ export default function PrivacyPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <NavBar />
-      <main id="main-content" className="mx-auto max-w-4xl px-4 pb-20 pt-28 sm:px-6">
+      <main id="main-content" className="mx-auto max-w-4xl px-4 pb-20 pt-8 sm:px-6">
         <Link to="/" className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm text-muted-foreground transition hover:border-primary/40 hover:text-primary">
           <ArrowLeft className="h-4 w-4" />
           {l.back}

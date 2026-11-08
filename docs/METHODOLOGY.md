@@ -1,32 +1,31 @@
-# Scientific methodology and limits
+# Metodologia e fontes · NiñoPulse 3.0
 
-## Official observations
+## Tempo local e Earth Live
 
-NiñoPulse retrieves current ENSO discussion text, seasonal probability tables and weekly Niño-region SST anomalies from NOAA/CPC sources. The backend applies timeouts, parsing validation, a short in-memory cache and a last-valid fallback.
+O Open-Meteo fornece estimativas de modelo. Meu Clima exibe a hora local da condição modelada e a hora da consulta. A probabilidade diária corresponde à maior chance horária de precipitação para aquele dia.
 
-## Historical series
+O mapa apresenta pontos consultados para temperatura, precipitação do intervalo de referência e temperatura da superfície do mar. A camada de anomalias usa médias semanais da NOAA/CPC para as regiões Niño, com base 1991–2020. A cartografia usa o conjunto de terras em escala 1:110 milhões da Natural Earth, em domínio público.
 
-The history service retrieves NOAA's Relative Oceanic Niño Index (RONI), the current official monitoring index, and the ONI table for historical comparison. Rows are parsed into overlapping three-month seasons. Warm and cold episodes are detected only after at least five consecutive seasons at or beyond ±0.5 °C. The interface identifies the source and whether a local fallback dataset is being shown.
+## O que mudou?
 
-## Live country weather
+O dispositivo guarda a última consulta bem-sucedida de cada dia no fuso da cidade. Compara ontem e hoje para as mesmas datas-alvo, considerando até dois dias. Exibe diferenças a partir de 10 pontos percentuais na chance de precipitação e 2 °C na máxima. O primeiro acesso estabelece a referência.
 
-NiñoPulse retrieves current conditions and a seven-day forecast from Open-Meteo for one representative monitoring location in each of the 30 countries. The server requests all locations in one batch, caches the normalized response for ten minutes and preserves the last valid snapshot if the provider is temporarily unavailable. Current values are weather-model estimates, not a national average, station observation or official emergency warning. Open-Meteo data are attributed under CC BY 4.0.
+As categorias acompanhadas também registram novos identificadores de avisos oficiais, mudanças relevantes em cidades salvas e novos boletins do ENSO. Cada categoria é opcional.
 
-## Country scenarios
+## ENSO e alertas
 
-Country profiles are manually curated educational summaries of commonly discussed historical ENSO impacts. The current global phase and official seasonal probability are used to select a scenario label and a relative display signal. This does not model local rainfall, temperature, crops or economic losses. Users should consult national meteorological and emergency agencies for operational guidance.
+A fase vem da discussão oficial da NOAA/CPC. As probabilidades sazonais descrevem a fase do ENSO no Pacífico em janelas móveis de três meses. RONI e ONI são índices históricos distintos. Os efeitos regionais variam por evento e estação. A atribuição de uma tempestade específica exige estudo próprio.
 
-## Experimental Signal Index
+No Brasil, o app cruza o ponto da cidade com polígonos e círculos do feed CAP da Defesa Civil. Nos Estados Unidos, consulta alertas ativos por ponto do NWS. A cobertura depende da área informada pelos emissores. O INMET é uma fonte complementar no Brasil.
 
-The Signal Index is a bounded 0–100 exploratory score built from:
+## Fontes
 
-- availability/quality of official inputs;
-- magnitude of the weekly Niño 3.4 anomaly;
-- agreement of seasonal probabilities;
-- clarity of probability trend.
-
-It is not machine learning, a calibrated probability, a confidence interval or an official NOAA product. The application exposes the ingredients and labels the result as experimental.
-
-## Map layers
-
-Map layers classify the static educational country profiles by historical threat categories. They are not satellite rasters, drought-monitor layers, flood polygons or live hazard maps.
+- [Open-Meteo](https://open-meteo.com/en/docs)
+- [Open-Meteo Marine](https://open-meteo.com/en/docs/marine-weather-api)
+- [Natural Earth](https://www.naturalearthdata.com/)
+- [NOAA/CPC · diagnóstico](https://cpc.ncep.noaa.gov/products/analysis_monitoring/enso_advisory/ensodisc.shtml)
+- [NOAA/CPC · probabilidades](https://cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/probabilities/)
+- [NOAA/CPC · RONI](https://cpc.ncep.noaa.gov/products/analysis_monitoring/enso/roni/)
+- [NOAA/CPC · ONI](https://cpc.ncep.noaa.gov/products/analysis_monitoring/enso/oni/v6/)
+- [Defesa Civil](https://www.gov.br/mdr/pt-br/assuntos/protecao-e-defesa-civil/defesa-civil-alerta)
+- [NWS · avisos](https://www.weather.gov/documentation/services-web-alerts)

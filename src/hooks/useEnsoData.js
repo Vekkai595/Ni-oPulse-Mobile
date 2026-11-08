@@ -1,60 +1,30 @@
-import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { ensoFallback } from "@/lib/ensoFallback";
-import { resolveApiUrl } from "@/lib/runtime";
+import { loadNoaaEnso, NOAA_SOURCES } from "@/lib/noaaData";
+import { readLocal, writeLocal } from "@/lib/localStore";
+import { climateSource, nativeSource } from "@/services/officialData";
 
-const STORAGE_KEY = "ninopulse-last-valid-enso";
+const KEY = "ninopulse-official-enso-v3";
+const INTERVAL = 30 * 60 * 1000;
+const EMPTY = { current: null, forecast: null, sources: Object.values(NOAA_SOURCES).map((source) => ({ ...source, available: false })), stale: true };
 
-function readCachedData() {
-  try {
-    const value = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return value?.current && value?.forecast ? value : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-async function fetchEnsoData({ signal }) {
-  const response = await fetch(resolveApiUrl("/api/enso"), {
-    headers: { Accept: "application/json" },
-    signal,
-  });
-  if (!response.ok) {
-    let detail = "";
-    try {
-      const body = await response.json();
-      detail = body.detail || body.error || "";
-    } catch {
-      // The best available local copy will be used.
-    }
-    throw new Error(detail || `ENSO API returned HTTP ${response.status}`);
-  }
-  return response.json();
-}
-
-export function useEnsoData() {
-  const cached = typeof window === "undefined" ? undefined : readCachedData();
+export function useEnsoData(enabled = true) {
   const query = useQuery({
-    queryKey: ["enso-official-data"],
-    queryFn: fetchEnsoData,
-    initialData: cached,
-    initialDataUpdatedAt: cached ? new Date(cached.generatedAt || 0).getTime() : undefined,
-    refetchInterval: 10 * 60 * 1000,
-    refetchOnReconnect: true,
-    refetchOnWindowFocus: true,
-    retry: 2,
+    queryKey: ["enso-official-v3"],
+    enabled,
+    initialData: () => readLocal(KEY) ?? undefined,
+    initialDataUpdatedAt: () => Date.parse(readLocal(KEY)?.generatedAt) || undefined,
+    queryFn: async ({ signal }) => {
+      const data = await climateSource("/api/enso", () => loadNoaaEnso(({ url }) => nativeSource(url)), signal);
+      if (!data?.ok || !data.current) throw new Error("Invalid NOAA response");
+      if (!data.stale) writeLocal(KEY, data);
+      return data;
+    },
+    staleTime: INTERVAL, refetchInterval: INTERVAL, refetchOnWindowFocus: true, retry: 1,
   });
-
-  useEffect(() => {
-    if (query.data?.current && !query.data?.stale) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(query.data));
-    }
-  }, [query.data]);
-
   return {
-    ...query,
-    data: query.data || cached || ensoFallback,
-    isFallback: !query.data || Boolean(query.data?.stale),
-    configurationError: query.error?.message?.includes("VITE_API_BASE_URL") ? query.error.message : null,
+    ...query, data: query.data || EMPTY, hasData: Boolean(query.data),
+    isFallback: !query.data || query.isError || query.isPaused || Boolean(query.data?.stale) ||
+      Date.now() - Date.parse(query.data?.generatedAt) > 2 * INTERVAL,
+    configurationError: null,
   };
 }

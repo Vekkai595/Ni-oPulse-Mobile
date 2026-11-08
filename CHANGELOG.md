@@ -1,4 +1,18 @@
-# Changelog
+# Histórico de versões
+
+## 3.0.0 · revisão de 8 de novembro de 2026
+
+- A tela inicial voltou a mostrar o painel ENSO do NiñoPulse, com o logotipo, a paleta e os cartões originais nos temas claro e escuro.
+- A navegação fica no topo no computador e na barra inferior no celular. A tela inicial tem um atalho para a previsão por cidade.
+- Meu Clima abre com a busca internacional e reúne favoritos, cidade principal, localização aproximada opcional e previsões de 24 horas e sete dias.
+- O que mudou? compara previsões para a mesma data e reúne atualizações de acompanhamento.
+- ENSO Tracker separa boletins, probabilidades sazonais, séries históricas RONI e ONI e observações oceânicas da NOAA. A leitura foi corrigida para valores negativos em colunas adjacentes.
+- Earth Live ganhou quatro camadas e cartografia Natural Earth incorporada.
+- Alertas integra Defesa Civil e NWS, com acompanhamento e notificações locais opcionais enquanto o app está aberto.
+- Explorar inclui seis guias em português e inglês, perfis regionais e atalhos para pesquisa.
+- Interface responsiva com tema claro e escuro, fontes, datas e estados de conexão.
+- Android atualizado para Capacitor 8.6, SDK 36 e JDK 21. A versão 3.0.0 usa código 30.
+- Política de privacidade revisada e dependências de produção atualizadas.
 
 ## 2.3.0-beta.1 — School-ready mobile hardening
 

@@ -1,6 +1,9 @@
 import { useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { resolveApiUrl } from "@/lib/runtime";
+import { buildOpenMeteoUrl, normalizeForecastResponse } from "../../server/live-country-service.js";
+import { climateSource } from "@/services/officialData";
+import { getJson } from "@/lib/weather";
+import { writeLocal } from "@/lib/localStore";
 
 const STORAGE_KEY = "ninopulse-last-valid-live-countries";
 
@@ -14,21 +17,7 @@ function readCachedData() {
 }
 
 async function fetchLiveCountries({ signal }) {
-  const response = await fetch(resolveApiUrl("/api/live-countries"), {
-    headers: { Accept: "application/json" },
-    signal,
-  });
-  if (!response.ok) {
-    let detail = "";
-    try {
-      const body = await response.json();
-      detail = body.detail || body.error || "";
-    } catch {
-      // The browser cache may still provide the last valid snapshot.
-    }
-    throw new Error(detail || `Live countries API returned HTTP ${response.status}`);
-  }
-  return response.json();
+  return climateSource("/api/live-countries", async () => normalizeForecastResponse(await getJson(buildOpenMeteoUrl(), signal)), signal);
 }
 
 export function useLiveCountries() {
@@ -47,7 +36,7 @@ export function useLiveCountries() {
 
   useEffect(() => {
     if (query.data?.countries?.length === 30 && !query.data?.stale) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(query.data));
+      writeLocal(STORAGE_KEY, query.data);
     }
   }, [query.data]);
 
